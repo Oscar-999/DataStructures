@@ -32,7 +32,7 @@ public:
     int getVin() const;
 
     //Displays
-    string toString() const;
+    virtual string toString() const;
 };
 
 

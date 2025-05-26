@@ -1,8 +1,6 @@
 //Oscar Alcantar
-//Week1 Homework
-//Description: Write a class and driver to implement functionality related to vehicles. Display a menu of
-//options to the user, and implement the functionality to add, delete, and search for a
-//vehicle, and to display all vehicles.
+//Week 2 Homework
+//Description: Write a program that implements a simple inheritance hierarchy related to vehicles.
 
 
 #include "Vehicle.h"
@@ -49,8 +47,8 @@ int Vehicle::getVin() const{
 //Format output
 string Vehicle::toString() const {
     stringstream ss;
-    ss << left << setw(10) << make
-          << setw(10) << model
+    ss << left << setw(20) << make
+          << setw(15) << model
           << setw(5) << setfill('0') << vin;
     return ss.str();
 }

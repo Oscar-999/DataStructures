@@ -6,6 +6,8 @@
 
 
 #include "Vehicle.h"
+#include "Truck.h"
+#include "Car.h"
 #include <iomanip>
 #include <iostream>
 #include <sstream>
@@ -31,9 +33,9 @@ int main() {
 
         switch (choice) {
             case 1: addVehicle(); break;
-            case 2: deleteVehicle(); break;
-            case 3: searchForVehicle(); break;
-            case 4: displayAllVehicles(); break;
+            // case 2: deleteVehicle(); break;
+            // case 3: searchForVehicle(); break;
+            // case 4: displayAllVehicles(); break;
             case 5: cout << "\nGoodbye!\n"; break;
             default: cout << "\nInvalid Option.\n";
 
@@ -56,67 +58,85 @@ void displayMenu() {
 }
 
 void addVehicle() {
+    int choice;
+    cout << "\nWhat kind of vehicle? 1 - Car, 2 - Truck: ";
+    cin >> choice;
     string make,model;
+
     int vin;
     //Boolean to keep track if added
     bool added = false;
     //User prompts
-    cout << "\nEnter make: ";
+    cout << "Enter make: ";
     cin >> make;
     cout << "Enter model: ";
     cin >> model;
     cout << "Enter vin: ";
     cin >> vin;
 
-    for (int i = 0; i < SIZE; i++) {
-        if (vehicles[i].getVin() == 0) {
-            // Sets an array to open element / vin = 0
-            vehicles[i] = Vehicle(make, model, vin);
-            cout << "\nVehicle Added.";
-            added = true;
-            break;
-        }
+    if (choice == 1) {
+        string bodyStyle;
+        cout << "Body Style: ";
+        cin >> bodyStyle;
+        Car car(make,model,vin,bodyStyle);
+        cout << "Vehicle added:\n" << car.toString() << endl;
+    } else if (choice == 2) {
+        int loadWeight;
+        cout << "Load weight: ";
+        cin >> loadWeight;
+        Truck truck(make,model,vin,loadWeight);
+        cout << "Vehicle added:\n" << truck.toString() << endl;
     }
-    if (!added) {
-        cout << "No more space in Array";
-    }
-}
 
-void deleteVehicle() {
-    int vin;
-    cout << "Enter vin to delete: ";
-    cin >> vin;
-    for (int i = 0; i < SIZE; i++) {
-        if (vehicles[i].getVin() == vin) {
-            //Default constructor to reset to empty
-            vehicles[i] = Vehicle();
-            cout << "Vehicle Deleted.\n";
-            return;
-        }
-    }
-    cout << "Vehicle does not exist in inventory.\n";
+    // for (int i = 0; i < SIZE; i++) {
+    //     if (vehicles[i].getVin() == 0) {
+    //         // Sets an array to open element / vin = 0
+    //         vehicles[i] = Vehicle(make, model, vin);
+    //         cout << "\nVehicle Added.";
+    //         added = true;
+    //         break;
+    //     }
+    // }
+    // if (!added) {
+    //     cout << "No more space in Array";
+    // }
 }
-
-void searchForVehicle() {
-    int vin;
-    cout << "Enter vin to search: ";
-    cin >> vin;
-
-    for (int i = 0; i < SIZE; i++) {
-        if (vehicles[i].getVin() == vin) {
-            cout << "Make      Model      Vin\n";
-            cout << vehicles[i].toString() << "\n";
-            return;
-        }
-    }
-}
-
-void displayAllVehicles() {
-    cout << "Make      Model     Vin\n";
-    for (int i = 0; i < SIZE; i++) {
-        if (vehicles[i].getVin() != 0) {
-            //Prints info
-            cout << vehicles[i].toString() << "\n";
-        }
-    }
-}
+//
+// void deleteVehicle() {
+//     int vin;
+//     cout << "Enter vin to delete: ";
+//     cin >> vin;
+//     for (int i = 0; i < SIZE; i++) {
+//         if (vehicles[i].getVin() == vin) {
+//             //Default constructor to reset to empty
+//             vehicles[i] = Vehicle();
+//             cout << "Vehicle Deleted.\n";
+//             return;
+//         }
+//     }
+//     cout << "Vehicle does not exist in inventory.\n";
+// }
+//
+// void searchForVehicle() {
+//     int vin;
+//     cout << "Enter vin to search: ";
+//     cin >> vin;
+//
+//     for (int i = 0; i < SIZE; i++) {
+//         if (vehicles[i].getVin() == vin) {
+//             cout << "Make      Model      Vin\n";
+//             cout << vehicles[i].toString() << "\n";
+//             return;
+//         }
+//     }
+// }
+//
+// void displayAllVehicles() {
+//     cout << "Make      Model     Vin\n";
+//     for (int i = 0; i < SIZE; i++) {
+//         if (vehicles[i].getVin() != 0) {
+//             //Prints info
+//             cout << vehicles[i].toString() << "\n";
+//         }
+//     }
+// }
