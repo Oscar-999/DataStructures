@@ -15,6 +15,7 @@ Truck::Truck() : Vehicle(), loadWeight(0) {}
 Truck::Truck(string make,string model,int vin , int loadWeight)
     : Vehicle(make,model,vin), loadWeight(loadWeight) {}
 
+//getter and setter
 int Truck::getLoadWeight() const{
   return loadWeight;
 }

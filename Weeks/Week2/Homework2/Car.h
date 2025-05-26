@@ -15,9 +15,12 @@ class Car : public Vehicle  {
 private:
   string bodyStyle;
   public:
-    Car();
-    Car(string make, string model, int vin , string bodyStyle);
 
+    //Default constructor
+    Car();
+    // 4parm constructor
+    Car(string make, string model, int vin , string bodyStyle);
+    //get and setters
     string getBodyStyle() const;
     void setBodyStyle(string bodyStyle);
     string toString() const override;

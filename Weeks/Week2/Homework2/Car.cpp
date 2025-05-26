@@ -16,6 +16,7 @@ Car::Car() : Vehicle(), bodyStyle("") {}
 Car::Car(string make, string model, int vin, string bodyStyle)
     : Vehicle(make, model , vin), bodyStyle(bodyStyle) {}
 
+//getter and setter
 void Car::setBodyStyle(string body) {
   bodyStyle = body;
 }
