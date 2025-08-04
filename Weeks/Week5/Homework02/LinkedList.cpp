@@ -79,12 +79,37 @@ void LinkedList::deleteNode(int val) {
 
 }
 
-void LinkedList::printList() {
-    LLNode* current = head; //loop control variable
+// void LinkedList::printList() {
+//     LLNode* current = head; //loop control variable
+//
+//     while (current != nullptr) { //this will end when it is at the tail
+//         cout << current->data << " " ; //print the data of the node we are at
+//         current = current->next; //iterating forward
+//     }
+//
+// }
 
-    while (current != nullptr) { //this will end when it is at the tail
-        cout << current->data << " " ; //print the data of the node we are at
-        current = current->next; //iterating forward
-    }
+//pubblic method to start tail recursive print
+void LinkedList::printListTailRecursive() {
+    printListTailRecursive(head);
+    cout << endl;
+}
 
+//tail recursive helper
+void LinkedList::printListTailRecursive(LLNode *node) {
+    if (node == nullptr) return;
+    cout << node->data << " ";
+    printListTailRecursive(node->next);
+}
+
+//public method to start non tail print
+void LinkedList::printListNonTailRecursive() {
+    printListNonTailRecursive(head);
+    cout << endl;
+}
+
+void LinkedList::printListNonTailRecursive(LLNode* node) {
+   if (node == nullptr) return;
+    printListNonTailRecursive(node->next);
+    cout << node->data << " ";
 }

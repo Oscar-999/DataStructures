@@ -3,10 +3,12 @@
 //Description: Add functionality to the 03 – Polymorphism project that reads data from a plain text file
 // and stores the data in objects of the appropriate class, which are then stored in an
 // array
+// Also tracks and displays BigO complexity for each algorithm operation
 
 #include "Vehicle.h"
 #include "Car.h"
 #include "Truck.h"
+#include "BigO.h"
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -16,6 +18,8 @@ using namespace std;
 
 Vehicle** vehicles;  // declare pointer to pointer
 int vehicleCount;
+
+BigO bigO;  // BigO object to track operations
 
 //prototypes
 void displayMenu();
@@ -29,13 +33,15 @@ void readData(int vehicleCount);
 int main() {
     vehicleCount = countData();
 
-
     vehicles = new Vehicle*[vehicleCount];
     for (int i = 0; i < vehicleCount; i++) {
         vehicles[i] = nullptr;
     }
 
     readData(vehicleCount);
+
+    // Display BigO for reading and building the array
+    cout << "BigO for reading and building array: " << bigO.getBigO(vehicleCount) << endl;
 
     int choice;
     do {
@@ -126,7 +132,11 @@ void addVehicle() {
         return;
     }
 
+    bigO.updateTotalOperations(4);  // count inputs and object creation
+
     cout << "\nVehicle added:\n" << vehicles[index]->toString() << endl;
+
+    cout << "BigO for add operation: " << bigO.getBigO(vehicleCount) << endl;
 }
 
 void deleteVehicle() {
@@ -136,15 +146,21 @@ void deleteVehicle() {
     cin.ignore();
 
     for (int i = 0; i < vehicleCount; i++) {
-        if (vehicles[i] != nullptr && vehicles[i]->getVin() == vin) {
-            delete vehicles[i];
-            // new vehicle resets to nullptr (empty slot)
-            vehicles[i] = nullptr;
-            cout << "Vehicle deleted from inventory.\n";
-            return;
+        if (vehicles[i] != nullptr) {
+            bigO.updateTotalOperations(1);  // count comparison
+
+            if (vehicles[i]->getVin() == vin) {
+                delete vehicles[i];
+                // new vehicle resets to nullptr (empty slot)
+                vehicles[i] = nullptr;
+                cout << "Vehicle deleted from inventory.\n";
+                cout << "BigO for delete operation: " << bigO.getBigO(vehicleCount) << endl;
+                return;
+            }
         }
     }
     cout << "Vehicle not found.\n";
+    cout << "BigO for delete operation: " << bigO.getBigO(vehicleCount) << endl;
 }
 
 void searchForVehicle() {
@@ -154,23 +170,35 @@ void searchForVehicle() {
     cin.ignore();
 
     for (int i = 0; i < vehicleCount; i++) {
-        if (vehicles[i] != nullptr && vehicles[i]->getVin() == vin) {
-            cout << vehicles[i]->toString() << endl;
-            return;
+        if (vehicles[i] != nullptr) {
+            bigO.updateTotalOperations(1);  // count comparison
+
+            if (vehicles[i]->getVin() == vin) {
+                cout << vehicles[i]->toString() << endl;
+                cout << "BigO for search operation: " << bigO.getBigO(vehicleCount) << endl;
+                return;
+            }
         }
     }
     cout << "Vehicle not found.\n";
+    cout << "BigO for search operation: " << bigO.getBigO(vehicleCount) << endl;
 }
 
 void displayAllVehicles() {
     cout << "\nAll Vehicles:\n";
     cout << left << setw(20) << "Make" << setw(15) << "Model"
          << setw(12) << "VIN" << setw(20) << "Body Style / Load Weight\n";
+
+    int displayCount = 0;
     for (int i = 0; i < vehicleCount; i++) {
-        if (vehicles[i] != nullptr && vehicles[i]->getVin() != 0) { // Without checking if it is at a nullptr it crashes retrive non 0 vins only
+        if (vehicles[i] != nullptr && vehicles[i]->getVin() != 0) { // Without checking if it is at a nullptr it crashes retrieve non 0 vins only
             cout << vehicles[i]->toString() << endl;
+            bigO.updateTotalOperations(1);  // count printing one vehicle
+            displayCount++;
         }
     }
+
+    cout << "BigO for display operation: " << bigO.getBigO(displayCount) << endl;
 }
 
 int countData() {
@@ -195,7 +223,7 @@ int countData() {
 
 //Nessary comment
 // This program reads the data file line by line and creates objects one at a time.
-// It works fine for now, but it is not very fast or efficient it would take way to long the longer the file is.
+// It works fine for now, but it is not very fast or efficient it would take way too long the longer the file is.
 
 void readData(int vehicleCount) {
     //simple check to see if file exist comm practice
@@ -205,12 +233,13 @@ void readData(int vehicleCount) {
         return;
     }
 
-
     string line;
-    // will stop at the line count amount we got from countdata
+    // will stop at the line count amount we got from countData
     for (int i = 0; i < vehicleCount; i++) {
         getline(file, line);
         if (line.empty()) continue;
+
+        bigO.updateTotalOperations(1);  // count reading one line
 
         istringstream iss(line); // this allows you to treat the line as a string for simpler parsing
 
@@ -225,7 +254,6 @@ void readData(int vehicleCount) {
         // this removes the carriage return
         if (!extra.empty() && extra.back() == '\r') extra.pop_back();
 
-
         int vin = stoi(vinStr); //string to intger needed for actual object creation
 
         if (type == "Truck") {
@@ -237,8 +265,9 @@ void readData(int vehicleCount) {
         } else {
             vehicles[i] = new Vehicle();
             //default case
-
         }
+
+        bigO.updateTotalOperations(5);  // count parsing and object creation operations
     }
 
     file.close();

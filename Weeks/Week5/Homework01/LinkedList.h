@@ -17,6 +17,7 @@ private:
     //void addNode(); not listed??
     void addToHead(int value);
     void addToTail(int value);
+    void
     void printList() ;
 };
 

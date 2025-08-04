@@ -15,8 +15,9 @@ int main() {
         cout << "1. Add to head\n";
         cout << "2. Add to tail\n";
         cout << "3. Delete a node\n";
-        cout << "4. Print Linked List\n";
-        cout << "5. Exit\n";
+        cout << "4. Print List using Tail Recursion\n";
+        cout << "5. Print List using Non-Tail Recursion\n";
+        cout << "6. Exit\n";
         cout << "Enter your choice: ";
         cin >> choice;
 
@@ -37,16 +38,20 @@ int main() {
             list.deleteNode(val);
             break;
             case 4:
-                cout << "Printing List\n";
-            list.printList();
+                cout << "Printing List (Tail-Recursion):\n";
+            list.printListTailRecursive();
             break;
             case 5:
-                cout << "Exiting!!!\n";
+                cout << "Printing List(Non-Tail Recursion):\n";
+            list.printListNonTailRecursive();
             break;
+            case 6:
+                cout << "Exiting!!!\n";
+                break;
             default:
                 cout << "Invalid choice\n";
         }
-    } while (choice !=5);
+    } while (choice !=6);
 
     return 0;
 }

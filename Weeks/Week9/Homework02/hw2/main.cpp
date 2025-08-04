@@ -1,12 +1,15 @@
-//Oscar Alcantar
-//Week 7 Homework
-//Description: Add functionality to the 03 – Polymorphism project that reads data from a plain text file
+// Oscar Alcantar
+// Week 7 Homework
+// Description: Add functionality to the 03 – Polymorphism project that reads data from a plain text file
 // and stores the data in objects of the appropriate class, which are then stored in an
 // array
+// Also tracks and displays BigO complexity for each algorithm operation
 
 #include "Vehicle.h"
 #include "Car.h"
 #include "Truck.h"
+#include "BigO.h"
+#include "LinkedList.h"
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -14,8 +17,8 @@
 #include <iomanip>
 using namespace std;
 
-Vehicle** vehicles;  // declare pointer to pointer
-int vehicleCount;
+LinkedList vehicleList;  // global LinkedList object
+BigO bigO;               // BigO object to track operations
 
 //prototypes
 void displayMenu();
@@ -23,24 +26,19 @@ void addVehicle();
 void deleteVehicle();
 void searchForVehicle();
 void displayAllVehicles();
-int countData();
-void readData(int vehicleCount);
+void readData();
 
 int main() {
-    vehicleCount = countData();
+    readData();
 
-
-    vehicles = new Vehicle*[vehicleCount];
-    for (int i = 0; i < vehicleCount; i++) {
-        vehicles[i] = nullptr;
-    }
-
-    readData(vehicleCount);
+    // Display BigO for reading and building the list
+    cout << "BigO for reading and building list: " << bigO.getBigO(0) << endl;
 
     int choice;
     do {
         displayMenu(); //calls displaymenu func
         cin >> choice;
+        cin.ignore();
 
         switch (choice) {
             case 1: addVehicle(); break;
@@ -53,12 +51,7 @@ int main() {
     } while (choice != 5);
 
     // Cleanup  conflict leaving cars
-    for (int i = 0; i < vehicleCount; i++) {
-        delete vehicles[i];
-        vehicles[i] = nullptr;
-    }
-
-    delete[] vehicles; // clean up the array itself
+    // No manual deletion needed since LinkedList handles it
 
     return 0;
 }
@@ -90,43 +83,42 @@ void addVehicle() {
     cin >> vin;
     cin.ignore();
 
-    // Find an empty slot (nullptr)
-    int index = -1;
-
-    for (int i = 0; i < vehicleCount; i++) {
-        // this allows me to add a vehicle to a viable space
-        if (vehicles[i] == nullptr) {
-            index = i;
-            break;
-        }
-    }
-
-    if (index == -1) {
-        cout << "No space left in the array.\n";
-        return;
-    }
+    Vehicle* newVehicle = nullptr;
 
     if (type == 1) {
         string bodyStyle;
         cout << "Enter body style: ";
         getline(cin, bodyStyle);
-        // adding car to the index we are on now
-        vehicles[index] = new Car(make, model, vin, bodyStyle);
+        // adding car to the linked list tail
+        newVehicle = new Car(make, model, vin, bodyStyle);
     }
     else if (type == 2) {
         int loadWeight;
         cout << "Enter load weight: ";
         cin >> loadWeight;
         cin.ignore();
-        // adding truck to the index we are on by checking if null ptr
-        vehicles[index] = new Truck(make, model, vin, loadWeight);
+        // adding truck to the linked list tail
+        newVehicle = new Truck(make, model, vin, loadWeight);
     }
     else {
         cout << "Invalid vehicle type.\n";
         return;
     }
 
-    cout << "\nVehicle added:\n" << vehicles[index]->toString() << endl;
+    // vehicleList.addToTail(newVehicle);
+    // bigO.updateTotalOperations(4);  // count inputs and object creation
+    //
+    // cout << "\nVehicle added:\n" << newVehicle->toString() << endl;
+    //
+    // cout << "BigO for add operation: " << bigO.getBigO(0) << endl;
+    vehicleList.addToTail(newVehicle);
+    bigO.updateTotalOperations(4);  // count inputs and object creation
+
+    cout << "\nVehicle added:\n" << newVehicle->toString() << endl;
+
+    // Pass the current linked list size here:
+    int size = vehicleList.countNodes();
+    cout << "BigO for add operation: " << bigO.getBigO(size) << endl;
 }
 
 void deleteVehicle() {
@@ -135,16 +127,11 @@ void deleteVehicle() {
     cin >> vin;
     cin.ignore();
 
-    for (int i = 0; i < vehicleCount; i++) {
-        if (vehicles[i] != nullptr && vehicles[i]->getVin() == vin) {
-            delete vehicles[i];
-            // new vehicle resets to nullptr (empty slot)
-            vehicles[i] = nullptr;
-            cout << "Vehicle deleted from inventory.\n";
-            return;
-        }
-    }
-    cout << "Vehicle not found.\n";
+    vehicleList.deleteNode(vin);
+
+    // Pass the current linked list size here:
+    int size = vehicleList.countNodes();
+    cout << "BigO for delete operation: " << bigO.getBigO(size) << endl;
 }
 
 void searchForVehicle() {
@@ -153,51 +140,29 @@ void searchForVehicle() {
     cin >> vin;
     cin.ignore();
 
-    for (int i = 0; i < vehicleCount; i++) {
-        if (vehicles[i] != nullptr && vehicles[i]->getVin() == vin) {
-            cout << vehicles[i]->toString() << endl;
-            return;
-        }
+    Vehicle* found = vehicleList.search(vin);
+    if (found) {
+        cout << found->toString() << endl;
     }
-    cout << "Vehicle not found.\n";
+    else {
+        cout << "Vehicle not found.\n";
+    }
+
+    cout << "BigO for search operation: " << bigO.getBigO(0) << endl;
 }
 
 void displayAllVehicles() {
     cout << "\nAll Vehicles:\n";
     cout << left << setw(20) << "Make" << setw(15) << "Model"
          << setw(12) << "VIN" << setw(20) << "Body Style / Load Weight\n";
-    for (int i = 0; i < vehicleCount; i++) {
-        if (vehicles[i] != nullptr && vehicles[i]->getVin() != 0) { // Without checking if it is at a nullptr it crashes retrive non 0 vins only
-            cout << vehicles[i]->toString() << endl;
-        }
-    }
+
+    vehicleList.printList();
+        int size = vehicleList.countNodes();
+
+    cout << "BigO for display operation: " << bigO.getBigO(0) << endl;
 }
 
-int countData() {
-    //simple check to see if file exist comm practice
-    fstream file("07_vehicle_data.txt");
-    if (!file) {
-        cout << "Error opening file\n";
-        return 0;
-    }
-
-    string line;
-    int count = 0;
-    while (getline(file, line)) {
-        if (!line.empty()) {
-            count++;
-        }
-    }
-    file.close();
-    return count;
-}
-
-
-//Nessary comment
-// This program reads the data file line by line and creates objects one at a time.
-// It works fine for now, but it is not very fast or efficient it would take way to long the longer the file is.
-
-void readData(int vehicleCount) {
+void readData() {
     //simple check to see if file exist comm practice
     ifstream file("07_vehicle_data.txt");
     if (!file) {
@@ -205,12 +170,12 @@ void readData(int vehicleCount) {
         return;
     }
 
-
     string line;
-    // will stop at the line count amount we got from countdata
-    for (int i = 0; i < vehicleCount; i++) {
-        getline(file, line);
+    // will stop at EOF now, sentinel-controlled
+    while (getline(file, line)) {
         if (line.empty()) continue;
+
+        bigO.updateTotalOperations(1);  // count reading one line
 
         istringstream iss(line); // this allows you to treat the line as a string for simpler parsing
 
@@ -225,20 +190,23 @@ void readData(int vehicleCount) {
         // this removes the carriage return
         if (!extra.empty() && extra.back() == '\r') extra.pop_back();
 
-
         int vin = stoi(vinStr); //string to intger needed for actual object creation
+
+        Vehicle* vehiclePtr = nullptr;
 
         if (type == "Truck") {
             int loadWeight = stoi(extra); // load weight is an int like vin
-            vehicles[i] = new Truck(make, model, vin, loadWeight);// create truck
+            vehiclePtr = new Truck(make, model, vin, loadWeight);// create truck
         } else if (type == "Car") {
-            vehicles[i] = new Car(make, model, vin, extra);
-            // cout << " Added Car -> " << vehicles[i]->toString() << endl;
+            vehiclePtr = new Car(make, model, vin, extra);
+            // cout << " Added Car -> " << vehiclePtr->toString() << endl;
         } else {
-            vehicles[i] = new Vehicle();
+            vehiclePtr = new Vehicle(make, model, vin);
             //default case
-
         }
+
+        vehicleList.addToTail(vehiclePtr);
+        bigO.updateTotalOperations(5);  // count parsing and object creation operations
     }
 
     file.close();
